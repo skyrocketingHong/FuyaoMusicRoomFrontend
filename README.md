@@ -3,7 +3,7 @@
 
 线上预览: [扶摇 musicroom](https://music.skyrocketing.ninja)
 
-后端: https://github.com/skyrocketingHong/FuyaoMusicRoomFrontend
+后端: https://github.com/skyrocketingHong/FuyaoMusicRoom
 
 **其他介绍见后端项目**
 
