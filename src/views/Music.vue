@@ -1,15 +1,16 @@
 <template>
   <div>
+    <!-- 播放界面 -->
     <div v-if="isPlay">
       <navigation
         :musichouse="musichouse"
         @openShareDialog="openShare = !openShare"
       ></navigation>
-
-      <mu-container class="demo-container">
+      <mu-container class="demo-container" style="margin-top: 80px">
         <mu-row style="margin-bottom: 23px"></mu-row>
         <mu-row gutter>
-          <mu-col span="12" sm="12" md="8" lg="8" xl="9">
+          <!-- 左侧播放器 -->
+          <mu-col span="12" sm="12" md="8" lg="8" xl="8">
             <mu-col span="12">
               <mu-row>
                 <mu-col
@@ -18,7 +19,7 @@
                   md="5"
                   lg="4"
                   xl="3"
-                  style="text-align: center; padding: 0 0 40px 0"
+                  style="text-align: center"
                   @click="playMusic"
                 >
                   <mu-avatar
@@ -40,13 +41,30 @@
                       alt="pic"
                     />
                   </mu-avatar>
+                  <mu-flex justify-content="center">
+                    <mu-flex class="flex-demo" justify-content="start">
+                      <mu-icon value="volume_up" color="primary"></mu-icon>
+                    </mu-flex>
+                    <mu-flex
+                      class="flex-demo"
+                      justify-content="start"
+                      style="margin-left: 5px; margin-right: 10px"
+                      fill
+                    >
+                      <mu-slider
+                        class="demo-slider"
+                        color="#fb8e00"
+                        v-model="volume"
+                      ></mu-slider>
+                    </mu-flex>
+                  </mu-flex>
                 </mu-col>
                 <mu-col span="12" sm="12" md="7" lg="8" xl="9">
                   <div
                     style="
                       font-size: 26px;
                       font-weight: 600;
-                      margin: 4px 0 10px 20px;
+                      margin: 4px 0 10px 25px;
                       min-height: 31px;
                     "
                   >
@@ -57,7 +75,7 @@
                       style="
                         font-size: 18px;
                         font-weight: 400;
-                        margin: 0 auto 0 20px;
+                        margin: 0 auto 0 25px;
                         min-height: 21px;
                       "
                     >
@@ -66,20 +84,13 @@
                       <div style="font-size: 14px; color=gray">歌手</div>
                       {{ music ? music.artist : "" }}
                       <div style="font-size: 14px; color=gray">来源</div>
-                      {{ music.source === "Netease" ? "网易云音乐" : "QQ音乐" }}
-                    </div>
-                    <div
-                      style="
-                        font-size: 20px;
-                        font-weight: 400;
-                        margin: 0px 0px 0px 20px;
-                        min-height: 21px;
-                        text-align: left;
-                        width: 50%;
-                      "
-                    >
-                      <div style="font-size: 14px; color=gray">当前歌词</div>
-                      {{ lyric }}
+                      {{
+                        music.source === "Netease"
+                          ? "网易云音乐"
+                          : music.source === "QQMusic"
+                          ? "QQ音乐"
+                          : ""
+                      }}
                     </div>
                   </div>
                   <small id="musicEndTime" style="float: right">
@@ -88,25 +99,26 @@
                   <mu-linear-progress
                     mode="determinate"
                     :value="progress"
-                    color="#009688"
+                    color="#fb8e00"
+                    style="margin-left: 5px"
                   ></mu-linear-progress>
-                  <br />
-                  <mu-flex justify-content="center">
-                    <mu-flex class="flex-demo" justify-content="start">
-                      <mu-icon value="volume_up" color="teal"></mu-icon>
-                    </mu-flex>
-                    <mu-flex class="flex-demo" justify-content="start" fill>
-                      <mu-slider
-                        class="demo-slider"
-                        color="#009688"
-                        v-model="volume"
-                        style="color: rgb(0, 150, 136)"
-                      ></mu-slider>
-                    </mu-flex>
-                  </mu-flex>
                 </mu-col>
               </mu-row>
             </mu-col>
+            <div
+              style="
+                font-size: 20px;
+                font-weight: 400;
+                margin: 10px 0px 0px 20px;
+                min-height: 21px;
+                text-align: center;
+                width: 90%;
+                overflow: hide;
+              "
+            >
+              <div style="font-size: 14px; color=gray">当前歌词</div>
+              {{ lyric }}
+            </div>
             <mu-col span="12">
               <mu-data-table
                 style="
@@ -174,7 +186,8 @@
               </mu-data-table>
             </mu-col>
           </mu-col>
-          <mu-col span="12" sm="12" md="4" lg="4" xl="3">
+          <!-- 右侧聊天框 -->
+          <mu-col span="12" sm="12" md="4" lg="4" xl="4">
             <mu-col
               :style="
                 screenWidth < 766 && screenWidth !== 0
@@ -189,12 +202,12 @@
                   @click="openHouse = !openHouse"
                 >
                   <mu-icon left value="account_balance"></mu-icon>
-                  查看所有听歌房
+                  查看所有房间
                 </mu-button>
               </mu-flex>
               <mu-button flat color="white" @click="houseUser">
                 <mu-icon left value="supervisor_account"></mu-icon>
-                当前房间在线 {{ online }} 人
+                此房间在线 {{ online }} 人
               </mu-button>
               <mu-button
                 flat
@@ -203,7 +216,7 @@
                 style="float: right"
               >
                 <mu-icon left value="clear_all"></mu-icon>
-                一键清屏
+                清屏
               </mu-button>
               <div id="chat-container">
                 <div
@@ -246,95 +259,109 @@
                     : ''
                 "
               >
-                <mu-text-field
-                  :value="chatMessage"
-                  @input="updateChatMessage"
-                  @keydown.enter="sendHandler"
-                  placeholder="在此处输入消息"
-                  color="primary"
-                  class="width-size-100 chat-message"
-                ></mu-text-field>
-                <br />
-                <div style="color: white; display: flex">
-                  <div>
-                    <mu-radio
-                      :value="'Netease'"
-                      v-model="sourceChat"
-                      color="primary"
-                      :label="'从网易云音乐点歌'"
-                      class="searchSource"
-                    ></mu-radio>
-                    <br />
-                    <mu-radio
-                      :value="'qq'"
-                      v-model="sourceChat"
-                      color="primary"
-                      :label="'从QQ音乐点歌'"
-                      class="searchSource"
-                    ></mu-radio>
-                  </div>
-                  <div style="margin: auto">
+                <div
+                  style="display: flex; flex-direction: row; flex-wrap: nowrap"
+                >
+                  <mu-text-field
+                    :value="chatMessage"
+                    @input="updateChatMessage"
+                    @keydown.enter="sendHandler"
+                    placeholder="在此处输入消息"
+                    color="white"
+                    class="width-size-100 chat-message"
+                  ></mu-text-field>
+                  <mu-flex class="flex-wrapper" align-items="center">
                     <mu-button
-                      flat
+                      v-if="!isContented"
+                      @click="connect"
                       color="primary"
-                      @click="openManual = !openManual"
+                      style="width: 90%"
                     >
-                      <mu-icon left value="assignment"></mu-icon>
-                      教程
+                      连接服务器
                     </mu-button>
-                  </div>
+                    <mu-button
+                      v-if="isContented"
+                      @click="sendHandler"
+                      color="primary"
+                      style="width: 90%"
+                    >
+                      发送消息
+                    </mu-button>
+                  </mu-flex>
                 </div>
-
-                <mu-flex class="flex-wrapper" align-items="center">
-                  <mu-button
-                    v-if="!isContented"
-                    @click="connect"
+                <div
+                  style="
+                    color: white;
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    justify-content: space-around;
+                    align-items: center;
+                  "
+                >
+                  <mu-radio
+                    :value="'Netease'"
+                    v-model="sourceChat"
                     color="primary"
-                    style="width: 90%"
-                  >
-                    连接服务器
-                  </mu-button>
-                  <mu-button
-                    v-if="isContented"
-                    @click="sendHandler"
+                    :label="'从网易云音乐点歌'"
+                    class="searchSource"
+                  ></mu-radio>
+                  <mu-radio
+                    :value="'qq'"
+                    v-model="sourceChat"
                     color="primary"
-                    style="width: 90%"
-                  >
-                    发送消息
-                  </mu-button>
-                  <mu-button icon @click="openBotttomSheet">
-                    <mu-icon value="favorite" color="red"></mu-icon>
-                  </mu-button>
-                </mu-flex>
-
-                <div style="padding-top: 10px">
+                    :label="'从QQ音乐点歌'"
+                    class="searchSource"
+                  ></mu-radio>
+                </div>
+                <div
+                  style="
+                    padding-top: 10px;
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding-bottom: 10px;
+                  "
+                >
                   <mu-button
-                    style="margin-right: 10px"
+                    style="margin-right: 3px; min-width: 10%"
                     color="secondary"
                     @click="openPictureSearch = !openPictureSearch"
                   >
                     斗图
                   </mu-button>
                   <mu-button
-                    style="margin-right: 10px"
+                    style="margin-right: 3px; min-width: 10%"
                     color="secondary"
                     @click="musicSkipVote"
                   >
                     切歌
                   </mu-button>
                   <mu-button
-                    style="margin-right: 10px"
+                    style="margin-right: 3px; min-width: 10%"
                     color="secondary"
                     @click="openSearch = !openSearch"
                   >
                     搜歌
                   </mu-button>
                   <mu-button
-                    style="margin-right: 10px"
+                    style="margin-right: 3px; min-width: 10%"
                     color="secondary"
                     @click="searchTop"
                   >
                     热榜
+                  </mu-button>
+                  <mu-button
+                    style="margin-right: 3px; min-width: 10%"
+                    color="secondary"
+                    @click="openManual = !openManual"
+                  >
+                    教程
+                  </mu-button>
+                  <mu-button icon @click="openBotttomSheet">
+                    <mu-icon value="favorite" color="red"></mu-icon>
                   </mu-button>
                 </div>
               </div>
@@ -359,112 +386,161 @@
         <audio id="music2" :src="music2.url" style="display: none"></audio>
       </div>
     </div>
+    <!-- 首页 -->
     <div id="play" v-if="!isPlay" :style="backgroundDiv">
-      <mu-flex class="flex-wrapper" align-items="center">
-        <mu-flex
-          class="flex-wrapper"
-          justify-content="start"
-          fill
-          style="margin-top: 10px"
-        >
-          <mu-button
-            color="info"
-            flat
-            @click="linkDownload('https://music.skyrocketing.ninja/sponsor')"
+      <mu-appbar style="width: 100%; position: fixed" color="primary">
+        扶摇 musicroom
+      </mu-appbar>
+      <!-- 房间列表与新建房间 -->
+      <div
+        style="
+          display: flex;
+          clear: both;
+          flex-direction: row;
+          justify-content: space-evenly;
+          flex-wrap: wrap;
+          align-items: center;
+          overflow: hidden;
+          vertical-align: middle;
+          min-height: calc(100% - 64px);
+          padding-top: 64px;
+        "
+      >
+        <!-- 房间列表 -->
+        <div style="padding-top: 32px">
+          <div
+            style="
+              text-align: center;
+              font-size: xx-large;
+              color: gray;
+              margin-bottom: -80px;
+            "
           >
-            <mu-icon left value="favorite"></mu-icon>
-            赞赏
-          </mu-button>
-        </mu-flex>
-      </mu-flex>
-      <mu-flex
-        class="flex-wrapper"
-        justify-content="center"
-        style="margin-top: 10px"
-        wrap="wrap"
-      >
-        <mu-flex
-          v-for="(house, index) in homeHouses"
-          :key="house.id"
-          @click="enterHomeHouse(house.id, house.name, house.needPwd)"
-        >
-          <mu-tooltip :content="house.desc">
-            <mu-badge
-              :content="house.population ? house.population + '' : '0'"
-              circle
-              color="info"
-              style="margin: 8px 7px"
-              class="demo-icon-badge"
-            >
-              <mu-chip class="demo-chip" color="teal">
-                <mu-avatar :size="32" color="blue300">
-                  <mu-icon
-                    :value="house.needPwd ? 'lock' : 'lock_open'"
-                  ></mu-icon>
-                </mu-avatar>
-                {{ house.name }}
-              </mu-chip>
-            </mu-badge>
-          </mu-tooltip>
-        </mu-flex>
-      </mu-flex>
-
-      <mu-flex
-        class="flex-wrapper"
-        justify-content="center"
-        style="padding-top: 30px"
-      >
-        <mu-form :model="homeHouse" class="mu-demo-form" align="center">
-          <div align="center">
-            <mu-text-field
-              v-model="homeHouse.name"
-              placeholder="房间名称"
-            ></mu-text-field>
-            <mu-text-field
-              v-model="homeHouse.desc"
-              placeholder="房间描述"
-            ></mu-text-field>
-            <mu-text-field
-              v-if="homeHouse.needPwd"
-              placeholder="房间密码"
-              v-model="homeHouse.password"
-              :action-icon="visibility ? 'visibility_off' : 'visibility'"
-              :action-click="() => (visibility = !visibility)"
-              :type="visibility ? 'text' : 'password'"
-            ></mu-text-field>
-            <mu-text-field
-              action-icon="favorite"
-              :action-click="
-                () => linkDownload('https://music.skyrocketing.ninja/sponsor')
-              "
-              v-if="homeHouse.enableStatus"
-              v-model="homeHouse.retainKey"
-              placeholder="赞赏后获得订单号"
-            ></mu-text-field>
+            房间列表
           </div>
-          <mu-flex class="flex-wrapper" align-items="center">
-            <mu-flex class="flex-demo" justify-content="end" fill>
-              <mu-switch
-                v-model="homeHouse.needPwd"
-                color="primary"
-                label="房间密码"
-              ></mu-switch>
-            </mu-flex>
-            <mu-flex class="flex-demo" justify-content="center">
-              <mu-button color="primary" @click="createHomeHouse">
-                创建房间
-              </mu-button>
-            </mu-flex>
-            <mu-flex class="flex-demo" justify-content="start" fill>
-              <mu-switch
-                v-model="homeHouse.enableStatus"
-                color="primary"
-                label="房间永存"
-              ></mu-switch>
+          <mu-flex
+            class="flex-wrapper"
+            justify-content="center"
+            style="
+              margin-top: 200px;
+              float: left;
+              align-content: stretch;
+              margin-bottom: 60px;
+            "
+            wrap="wrap"
+          >
+            <mu-flex
+              v-for="(house, index) in homeHouses"
+              :key="house.id"
+              @click="enterHomeHouse(house.id, house.name, house.needPwd)"
+            >
+              <mu-tooltip :content="house.desc">
+                <mu-badge
+                  :content="house.population ? house.population + '' : '0'"
+                  circle
+                  color="info"
+                  style="margin: 8px 7px"
+                  class="demo-icon-badge"
+                >
+                  <mu-chip class="demo-chip" color="primary">
+                    <mu-avatar :size="32" color="secondary">
+                      <mu-icon
+                        :value="house.needPwd ? 'lock' : 'lock_open'"
+                      ></mu-icon>
+                    </mu-avatar>
+                    {{ house.name }}
+                  </mu-chip>
+                </mu-badge>
+              </mu-tooltip>
             </mu-flex>
           </mu-flex>
-        </mu-form>
-      </mu-flex>
+        </div>
+        <!-- 新建房间 -->
+        <div>
+          <div
+            style="
+              text-align: center;
+              font-size: xx-large;
+              color: gray;
+              margin-bottom: -120px;
+              margin-top: 60px;
+            "
+          >
+            新建房间
+          </div>
+          <mu-flex
+            class="flex-wrapper"
+            justify-content="center"
+            style="margin-top: 200px; float: left; align-content: stretch"
+            wrap="wrap"
+          >
+            <mu-form :model="homeHouse" class="mu-demo-form" align="center">
+              <div align="center">
+                <mu-text-field
+                  v-model="homeHouse.name"
+                  placeholder="房间名称"
+                  style="color: #989898de"
+                ></mu-text-field>
+                <br />
+                <mu-text-field
+                  v-model="homeHouse.desc"
+                  placeholder="房间描述"
+                  style="color: #989898de"
+                ></mu-text-field>
+                <br />
+                <mu-text-field
+                  v-if="homeHouse.needPwd"
+                  placeholder="房间密码"
+                  v-model="homeHouse.password"
+                  :action-icon="visibility ? 'visibility_off' : 'visibility'"
+                  :action-click="() => (visibility = !visibility)"
+                  :type="visibility ? 'text' : 'password'"
+                  style="color: #989898de"
+                ></mu-text-field>
+                <br />
+                <mu-text-field
+                  action-icon="favorite"
+                  :action-click="
+                    () =>
+                      linkDownload('https://music.skyrocketing.ninja/sponsor')
+                  "
+                  v-if="homeHouse.enableStatus"
+                  v-model="homeHouse.retainKey"
+                  placeholder="赞赏后获得订单号"
+                  style="color: #989898de"
+                ></mu-text-field>
+              </div>
+              <mu-flex
+                class="flex-wrapper"
+                align-items="center"
+                style="
+                  display: flex;
+                  clear: both;
+                  flex-direction: row;
+                  justify-content: space-evenly;
+                  flex-wrap: wrap;
+                  align-items: center;
+                  margin-bottom: 60px;
+                "
+              >
+                <mu-switch
+                  v-model="homeHouse.needPwd"
+                  color="primary"
+                  label="房间密码"
+                ></mu-switch>
+                <mu-switch
+                  v-model="homeHouse.enableStatus"
+                  color="primary"
+                  label="房间永存"
+                ></mu-switch>
+                <mu-button color="primary" @click="createHomeHouse">
+                  创建房间
+                </mu-button>
+              </mu-flex>
+            </mu-form>
+          </mu-flex>
+        </div>
+      </div>
       <mu-dialog
         id="sharereach"
         width="100%"
@@ -495,6 +571,7 @@
         ></mu-icon>
       </mu-dialog>
     </div>
+    <!-- 音乐搜索 -->
     <mu-dialog
       id="search"
       width="100%"
@@ -505,7 +582,7 @@
       <mu-appbar color="primary" title="🎶 搜索音乐">
         <mu-button slot="right" flat @click="openUser">😀 搜索用户</mu-button>
         <mu-button slot="right" flat @click="openGd">🧾 搜索歌单</mu-button>
-        <mu-button slot="right" flat @click="closeGq">❌ 关闭</mu-button>
+        <mu-button slot="right" flat @click="closeGq">❌</mu-button>
       </mu-appbar>
       <mu-container style="width: 100%">
         <mu-row>
@@ -515,7 +592,7 @@
               @input="updateSearchKeyword"
               @keydown.enter="search"
               :placeholder="placeHolderGq"
-              color="#009688"
+              color="#fb8e00"
               class="width-size-100"
               style="text-align: center"
             ></mu-text-field>
@@ -594,6 +671,7 @@
         </mu-row>
       </mu-container>
     </mu-dialog>
+    <!-- 歌单搜索 -->
     <mu-dialog
       id="searchGd"
       width="100%"
@@ -604,7 +682,7 @@
       <mu-appbar color="primary" title="🧾 搜索歌单">
         <mu-button slot="right" flat @click="openUser">😀 搜索用户</mu-button>
         <mu-button slot="right" flat @click="openGq">🎶 搜索音乐</mu-button>
-        <mu-button slot="right" flat @click="closeGd">❌ 关闭</mu-button>
+        <mu-button slot="right" flat @click="closeGd">❌</mu-button>
       </mu-appbar>
       <mu-container style="width: 100%">
         <mu-row>
@@ -614,7 +692,7 @@
               @input="updateSearchKeywordGd"
               @keydown.enter="searchGd"
               :placeholder="placeHolderGd"
-              color="#009688"
+              color="#fb8e00"
               class="width-size-100"
               style="text-align: center"
             ></mu-text-field>
@@ -699,6 +777,7 @@
         </mu-row>
       </mu-container>
     </mu-dialog>
+    <!-- 用户搜索 -->
     <mu-dialog
       id="searchUser"
       width="100%"
@@ -711,7 +790,7 @@
           >🧾 搜索歌单</mu-button
         >
         <mu-button slot="right" flat @click="openGq">🎶 搜索音乐</mu-button>
-        <mu-button slot="right" flat @click="closeUser">❌ 关闭</mu-button>
+        <mu-button slot="right" flat @click="closeUser">❌</mu-button>
       </mu-appbar>
       <mu-container style="width: 100%">
         <mu-row>
@@ -721,7 +800,7 @@
               @input="updateSearchKeywordUser"
               @keydown.enter="searchUser"
               placeholder="请输入用户昵称"
-              color="#009688"
+              color="#fb8e00"
               class="width-size-100"
               style="text-align: center"
             ></mu-text-field>
@@ -789,6 +868,7 @@
         </mu-row>
       </mu-container>
     </mu-dialog>
+    <!-- 二维码分享 -->
     <mu-dialog
       id="share"
       width="100%"
@@ -796,9 +876,9 @@
       fullscreen
       :open.sync="openShare"
     >
-      <mu-appbar color="primary" title="📲 分享">
+      <mu-appbar color="primary" title="📲 分享" subtitle="扶摇 musicroom">
         <mu-button slot="right" flat @click="openShare = !openShare">
-          ❌ 关闭</mu-button
+          ❌</mu-button
         >
       </mu-appbar>
       <mu-flex class="flex-wrapper" justify-content="center">
@@ -815,7 +895,7 @@
           <mu-card-media style="width: 250px">
             <img :src="miniQrcode" />
           </mu-card-media>
-          <mu-card-title sub-title="扫码穿梭到该房间"></mu-card-title>
+          <mu-card-title sub-title="扫码直接传送到该房间"></mu-card-title>
           <mu-card-media style="margin-top: 10px">
             <qrcode-vue
               id="qrcodeBox"
@@ -833,9 +913,11 @@
         </mu-card>
       </mu-flex>
     </mu-dialog>
+    <!-- 斗图 -->
     <mu-dialog id="search-picture" width="auto" :open.sync="openPictureSearch">
       <chat-search-picture></chat-search-picture>
     </mu-dialog>
+    <!-- 房间内的房间列表 -->
     <mu-dialog
       id="house_dialog"
       width="100%"
@@ -843,8 +925,8 @@
       fullscreen
       :open.sync="openHouse"
     >
-      <mu-appbar color="primary" title="🏡 房间">
-        <mu-button slot="right" flat @click="closeHouse">❌ 关闭</mu-button>
+      <mu-appbar color="primary" title="🏡 房间列表">
+        <mu-button slot="right" flat @click="closeHouse">❌</mu-button>
       </mu-appbar>
       <mu-flex class="flex-wrapper" justify-content="center">
         <mu-form :model="house" class="mu-demo-form" align="center">
@@ -875,7 +957,6 @@
               placeholder="赞赏后获得订单号"
             ></mu-text-field>
           </div>
-
           <mu-flex class="flex-wrapper" align-items="center">
             <mu-flex class="flex-demo" justify-content="end" fill>
               <mu-switch
@@ -918,8 +999,8 @@
               style="margin: 8px 7px"
               class="demo-icon-badge"
             >
-              <mu-chip class="demo-chip" color="teal">
-                <mu-avatar :size="32" color="blue300">
+              <mu-chip class="demo-chip" color="primary">
+                <mu-avatar :size="32" color="secondary">
                   <mu-icon
                     :value="houseItem.needPwd ? 'lock' : 'lock_open'"
                   ></mu-icon>
@@ -931,6 +1012,7 @@
         </mu-flex>
       </mu-flex>
     </mu-dialog>
+    <!-- 教程 -->
     <mu-drawer
       width="300"
       :open.sync="openManual"
@@ -967,41 +1049,41 @@
               openManual = !openManual;
               openSearch = !openSearch;
             "
-            style="cursor: pointer; color: #009688"
+            style="cursor: pointer; color: #fb8e00"
           >
             [点歌]
           </span>
           “，如果知道歌单id，还可以在歌曲窗口直接加*搜索：
-          <span style="color: #009688">*歌单id</span>
+          <span style="color: #fb8e00">*歌单ID</span>
           <br />
         </p>
         <br />
         <p>
-          3.不知道歌单id?,请点击-->
+          3.不知道歌单ID?,请点击-->
           <span
             @click="
               openManual = !openManual;
               openSearchGd = !openSearchGd;
             "
-            style="cursor: pointer; color: #009688"
+            style="cursor: pointer; color: #fb8e00"
           >
             [歌单]
           </span>
-          提示：歌单页面可以搜索网易歌单、网易用户id的歌单、qq歌单、qq用户id的歌单
+          提示：歌单页面可以搜索网易云音乐歌单、网易云音乐用户的歌单、QQ音乐歌单和QQ音乐用户的歌单
         </p>
         <br />
 
         <p>
           4.如点错歌曲可以输入 “
-          <span style="color: #009688">删除音乐 歌名</span>
-          ” 即可删除歌曲，管理员可以使用歌曲id删除。
+          <span style="color: #fb8e00">删除音乐 歌名</span>
+          ” 即可删除歌曲，管理员可以使用歌曲ID删除。
         </p>
         <br />
         <p>
           5.如遇不好听的歌可以输入 “
-          <span style="color: #009688">投票切歌</span>
+          <span style="color: #fb8e00">投票切歌</span>
           ” 或者点击 “
-          <span @click="musicSkipVote" style="cursor: pointer; color: #009688">
+          <span @click="musicSkipVote" style="cursor: pointer; color: #fb8e00">
             [切歌]
           </span>
           ”，默认当投票人数大于在线人数 30% 时将会切歌。管理员可以设置切歌率。
@@ -1009,26 +1091,26 @@
         <br />
         <p>
           6.输入 “
-          <span style="color: #009688">设置昵称 名字</span>
+          <span style="color: #fb8e00">设置昵称 名字</span>
           ” 可以设置自己的显示昵称，仅限当前客户端有效。
         </p>
         <br />
         <p>
           7.私聊：输入 “
-          <span style="color: #009688">@用户id 内容</span>
+          <span style="color: #fb8e00">@用户id 内容</span>
           ” 可以私聊相应用户，用户id即用户ip后面那一串字母，如ju2etxv2。
           不知道用户id,试着点击在线人数图标。
         </p>
         <br />
 
         <p>
-          8.想要斗图？ ┏ (゜ω゜)=☞ “
+          8.想要斗图？
           <span
             @click="
               openManual = !openManual;
               openPictureSearch = !openPictureSearch;
             "
-            style="cursor: pointer; color: #009688"
+            style="cursor: pointer; color: #fb8e00"
           >
             [斗图]
           </span>
@@ -1037,16 +1119,15 @@
         <br />
         <p>
           9.倒计时退出房间 输入 “
-          <span style="color: #009688">倒计时退出 1</span>
+          <span style="color: #fb8e00">倒计时退出 1</span>
           ” 则将在1分钟后退出房间。取消倒计时退出：
-          <span style="color: #009688">取消退出</span>
+          <span style="color: #fb8e00">取消退出</span>
           ”
         </p>
         <br />
         <p>
-          10.如果有什么好的想法、建议或问题可以单项向管理员发送消息，（＾∀＾●）ﾉｼ
-          “
-          <span style="color: #009688">@管理员 内容</span>
+          10.如果有什么好的想法、建议或问题可以单项向管理员发送消息, “
+          <span style="color: #fb8e00">@管理员 内容</span>
           ”, 空格隔开哦!
         </p>
         <br />
@@ -1060,143 +1141,137 @@
       <mu-card-text>
         <p>
           1.登录： “
-          <span style="color: #009688">admin 123456</span>
+          <span style="color: #fb8e00">admin 123456</span>
           ” 。
         </p>
         <br />
         <p>
           2.修改密码： “
-          <span style="color: #009688">修改密码 654321</span>
+          <span style="color: #fb8e00">修改密码 654321</span>
           ” 。
         </p>
         <br />
         <p>
           3.管理员公告 “
-          <span style="color: #009688">公告 请文明聊天</span>
+          <span style="color: #fb8e00">公告 请文明聊天</span>
           ”。
         </p>
         <br />
         <p>
           4.点赞模式（歌曲列表按点赞数排序）： “
-          <span style="color: #009688">点赞模式</span>
+          <span style="color: #fb8e00">点赞模式</span>
           ” 退出则“
-          <span style="color: #009688">退出点赞模式</span>
+          <span style="color: #fb8e00">退出点赞模式</span>
           ” 。
         </p>
         <br />
         <p>
           5.随机模式（歌曲列表随机播放）： “
-          <span style="color: #009688">随机模式</span>
+          <span style="color: #fb8e00">随机模式</span>
           ” 退出则“
-          <span style="color: #009688">退出随机模式</span>
+          <span style="color: #fb8e00">退出随机模式</span>
           ” 。
         </p>
         <br />
         <p>
           6.修改投票切歌率： “
-          <span style="color: #009688">投票切歌率 1</span>
+          <span style="color: #fb8e00">投票切歌率 1</span>
           ” 数值在(0,1]。如：设置成0.5则表示房间人数一半赞同即可切歌。
         </p>
         <br />
         <p>
           7.禁止切歌：“
-          <span style="color: #009688">禁止切歌</span>
+          <span style="color: #fb8e00">禁止切歌</span>
           ” 启用则“
-          <span style="color: #009688">启用切歌</span>
+          <span style="color: #fb8e00">启用切歌</span>
           ” 。
         </p>
         <br />
         <p>
           8.禁止点歌：“
-          <span style="color: #009688">禁止点歌</span>
+          <span style="color: #fb8e00">禁止点歌</span>
           ” 启用则“
-          <span style="color: #009688">启用点歌</span>
+          <span style="color: #fb8e00">启用点歌</span>
           ” 。
         </p>
         <br />
         <p>
           9.清空列表：“
-          <span style="color: #009688">清空列表</span>
+          <span style="color: #fb8e00">清空列表</span>
           ” 。
         </p>
         <br />
         <p>
           10.清空默认播放列表：“
-          <span style="color: #009688">清空默认列表</span>
+          <span style="color: #fb8e00">清空默认列表</span>
           ” 。
         </p>
         <br />
         <p>
           11.设置默认播放列表（当点歌列表为空时，默认从此加载歌曲）：“
-          <span style="color: #009688">设置默认列表 24381616,1</span>
-          ” ，其中243881616和1是歌单id
+          <span style="color: #fb8e00">设置默认列表 24381616,1</span>
+          ” ，其中243881616和1是歌单ID
         </p>
         <br />
         <p>
           12.默认列表歌曲数：“
-          <span style="color: #009688">默认列表歌曲数</span>
+          <span style="color: #fb8e00">默认列表歌曲数</span>
           ” 。
         </p>
         <br />
         <p>
           13.置顶音乐： “
-          <span style="color: #009688">置顶音乐 音乐id</span>
-          ” 音乐id即歌曲列表中歌曲后面那一串字母，如411214279。
+          <span style="color: #fb8e00">置顶音乐 音乐ID</span>
+          ” 音乐ID即歌曲列表中歌曲后面那一串字母，如411214279。
         </p>
         <br />
         <p>
           14.拉黑音乐：“
-          <span style="color: #009688">拉黑音乐 音乐id</span>
-          ” 漂白则“
-          <span style="color: #009688">漂白音乐 音乐id</span>
+          <span style="color: #fb8e00">拉黑音乐 音乐ID</span>
+          ” 漂白音乐：“
+          <span style="color: #fb8e00">漂白音乐 音乐ID</span>
           ” 。
         </p>
         <br />
         <p>
           15.音乐黑名单： “
-          <span style="color: #009688">音乐黑名单</span>
+          <span style="color: #fb8e00">音乐黑名单</span>
           ” 。
         </p>
         <br />
         <p>
           16.拉黑用户：“
-          <span style="color: #009688">拉黑用户 用户id</span>
+          <span style="color: #fb8e00">拉黑用户 用户ID</span>
           ” 漂白则“
-          <span style="color: #009688">漂白用户 用户id</span>
-          ” 用户id即用户ip后面那一串字母，如ju2etxv2。
+          <span style="color: #fb8e00">漂白用户 用户ID</span>
+          ” 用户ID即用户ip后面那一串字母，如ju2etxv2。
         </p>
         <br />
         <p>
           17.用户黑名单： “
-          <span style="color: #009688">用户黑名单</span>
+          <span style="color: #fb8e00">用户黑名单</span>
           ” 。
         </p>
         <br />
         <p>
           18.设置点歌人：“
-          <span style="color: #009688">设置点歌人 用户id</span>
-          ” 用户id即用户ip后面那一串字母，如ju2etxv2。取消则“
-          <span style="color: #009688">取消点歌人 用户id</span>
+          <span style="color: #fb8e00">设置点歌人 用户ID</span>
+          ” 用户ID即用户ip后面那一串字母，如ju2etxv2。取消则“
+          <span style="color: #fb8e00">取消点歌人 用户ID</span>
           ” 。
         </p>
         <br />
         <p>
           19.设置切歌人：“
-          <span style="color: #009688">设置切歌人 用户id</span>
-          ” 用户id即用户ip后面那一串字母，如ju2etxv2。取消则“
-          <span style="color: #009688">取消切歌人 用户id</span>
+          <span style="color: #fb8e00">设置切歌人 用户ID</span>
+          ” 用户ID即用户IP后面那一串字母，如ju2etxv2。取消则“
+          <span style="color: #fb8e00">取消切歌人 用户ID</span>
           ” 。
         </p>
         <br />
       </mu-card-text>
     </mu-drawer>
-
-    <Instruction
-      :open.sync="openManual"
-      :docked="false"
-      :right="true"
-    ></Instruction>
-
+    <!-- 音乐收藏列表 -->
     <mu-bottom-sheet
       id="sheet"
       :open.sync="open"
@@ -1243,7 +1318,6 @@ import { baseUrl, isProduction } from "../config/environment";
 import Navigation from "../components/Navigation";
 import ChatSearchPicture from "../components/ChatSearchPicture";
 import QrcodeVue from "qrcode.vue";
-import Instruction from "../components/Instruction";
 export default {
   name: "Music",
   components: {
@@ -1326,15 +1400,15 @@ export default {
       { title: "封面", name: "pictureUrl", align: "center" },
       { title: "描述", name: "desc", align: "center" },
       { title: "创建者", name: "creator", align: "center" },
-      { title: "创建者id", name: "creatorUid", align: "center" },
-      { title: "歌单id", name: "id", align: "center" },
+      { title: "创建者ID", name: "creatorUid", align: "center" },
+      { title: "歌单ID", name: "id", align: "center" },
       { title: "播放量", name: "playCount", align: "center" },
       { title: "曲数", name: "songCount", align: "center" },
     ],
     searchColumnsUser: [
       { title: "昵称", name: "nickname", width: 200, align: "left" },
       { title: "头像", name: "avatarUrl", align: "center" },
-      { title: "用户id", name: "userId", align: "center" },
+      { title: "用户ID", name: "userId", align: "center" },
       { title: "签名", name: "signature", align: "center" },
       { title: "描述", name: "description", align: "center" },
       { title: "性别", name: "gender", align: "center" },
@@ -1382,7 +1456,7 @@ export default {
     houseIdNoAction: "",
     housePwdNoAction: "123",
     connectTypeNoAction: "",
-    placeHolderGd: "试下为空搜索下(*^__^*)",
+    placeHolderGd: "搜索直接点搜索😏",
     placeHolderGq: "请输入关键字搜索",
     backgroundDiv: {
       overflow: "auto",
@@ -1392,12 +1466,12 @@ export default {
       width: "100%",
       height: "100%",
       zoom: 1,
-      background:
-        "url(" + require("../assets/images/background.jpg") + ") no-repeat",
+      background: "",
       "background-size": "100% 100%",
       "background-size": "cover",
       "-webkit-background-size": "cover",
       "-o-background-size": "cover",
+      "background-color": "cornsilk",
     },
     qrcodeVue: {
       size: 250,
@@ -1677,9 +1751,7 @@ export default {
           if (content === "") {
             content = 0;
           }
-
           stompClient.send("/music/volumn/" + content, {}, "");
-
           break;
         case "倒计时退出":
           content = sendUtils.parseContent(instruction, chatMessage);
@@ -1708,9 +1780,7 @@ export default {
           break;
         case "投票切歌率":
           content = sendUtils.parseContent(instruction, chatMessage);
-
           stompClient.send("/music/vote/" + content, {}, "");
-
           break;
         case "点赞模式":
           stompClient.send("/music/goodmodel/true", {}, "");
@@ -1962,7 +2032,6 @@ export default {
               this.$store.commit("setSocketGood", false);
             }
             // this.$forceUpdate();
-
             break;
           case messageUtils.messageType.PICK:
             if (messageContent.message == "goodlist") {
@@ -1978,10 +2047,8 @@ export default {
             }
             break;
           case messageUtils.messageType.VOLUMN:
-            //console.log(messageContent.data);
             music.volume = Number(messageContent.data) / 100;
             this.$store.commit("setPlayerVolume", messageContent.data);
-
             break;
           case messageUtils.messageType.MUSIC:
             this.lastLyric = "";
@@ -2398,8 +2465,6 @@ export default {
         }).then(({ result, value }) => {
           if (result) {
             this.houseEnter(id, name, value);
-          } else {
-            //this.$toast.message('点击了取消');
           }
         });
       } else {
@@ -2418,8 +2483,6 @@ export default {
         }).then(({ result, value }) => {
           if (result) {
             this.homeHouseEnter(id, name, value);
-          } else {
-            //this.$toast.message('点击了取消');
           }
         });
       } else {
@@ -2444,7 +2507,6 @@ export default {
     },
     homeHouseEnter(id, name, pwd) {
       this.loading = this.$loading({ overlayColor: "hsla(0, 0%, 100%, .5)" });
-
       this.$http
         .post("/house/enter", { id: id, password: pwd })
         .then((response) => {
@@ -2591,14 +2653,14 @@ export default {
     sourceGd: function (newValue, oldValue) {
       this.currentGd = 1;
       if (newValue == "qq_user") {
-        this.placeHolderGd = "qq用户id即qq号";
+        this.placeHolderGd = "QQ用户ID即QQ号";
       } else if (newValue == "NeteaseUser") {
-        this.placeHolderGd = "用户id不知，点右上用户";
+        this.placeHolderGd = "不知道用户ID？点击右上角用户搜索按照用户名查询";
       } else {
         let placeholders = [
-          "搜索[民谣]来听下吧",
-          "试下为空搜索(*^__^*)",
-          "请输入关键字，如'摇滚'",
+          "搜索“民谣”来听下吧",
+          "试试直接搜索会怎样",
+          "请输入关键字，如“摇滚”",
         ];
         this.placeHolderGd = placeholders[Math.floor(Math.random() * 3)];
       }
@@ -2606,9 +2668,9 @@ export default {
     source: function (newValue, oldValue) {
       this.current = 1;
       let placeholders = [
-        "请输入关键字搜索,如'遇见'",
+        "请输入关键字搜索,如“酒醉的玫瑰”",
         "歌单id搜索:'*歌单id'",
-        "不知听啥，点右上歌单...",
+        "不知道听啥？点击右上角搜索歌单",
       ];
       this.placeHolderGq = placeholders[Math.floor(Math.random() * 3)];
     },
@@ -2749,16 +2811,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.demo-container {
-  .row {
-    margin-bottom: 20px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-}
-
 .album {
   width: 100%;
   display: inline-block;
@@ -2773,7 +2825,6 @@ export default {
     rgb(0, 0, 0),
     rgb(39, 39, 39)
   );
-  /*box-shadow: 0 0 20px 2px #000;*/
 }
 
 .album-rotate {

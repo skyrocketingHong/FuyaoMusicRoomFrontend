@@ -1,12 +1,12 @@
 <template>
   <div>
-    <mu-appbar style="width: 100%" color="primary" z-depth="1">
+    <mu-appbar style="width: 100%; position: fixed; right: 0; top: 0" color="primary" z-depth="1">
       <mu-button icon slot="left" @click="isOpenDrawer = !isOpenDrawer">
         <mu-icon value="menu"></mu-icon>
       </mu-button>
-      🏡 房间名: {{ musichouse }}
-      <mu-button slot="right" flat @click="handleClick">📲 分享</mu-button>
-      <mu-button slot="right" flat href="https://music.skyrocketing.ninja">❌ 退出</mu-button>
+      {{ musichouse }}
+      <mu-button slot="right" flat @click="handleClick" @show="musichouse == null">📲</mu-button>
+      <mu-button slot="right" flat href="/">❌</mu-button>
     </mu-appbar>
     <mu-drawer
       width="300"

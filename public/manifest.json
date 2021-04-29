@@ -1,0 +1,20 @@
+{
+    "name": "扶摇 musicroom",
+    "short_name": "扶摇 musicroom",
+    "start_url": "https://music.skyrocketing.ninja",
+    "icons": [
+        {
+            "src": "favicon/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "favicon/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#FAB962",
+    "background_color": "#FAB962",
+    "display": "standalone"
+}

@@ -9,11 +9,12 @@ import * as colors from 'muse-ui/lib/theme/colors';
 import Toast from 'muse-ui-toast';
 import 'muse-ui-loading/dist/muse-ui-loading.css'; // load css
 import 'muse-ui-message/dist/muse-ui-message.css';
-
+import './registerServiceWorker'
 import Loading from 'muse-ui-loading';
 import Message from 'muse-ui-message';
 
 import axios from 'axios';
+import './registerServiceWorker'
 
 // 给Vue实例添加一个是个属性，这样在每个实例中就可以使用this.$http来访问axios实例了
 Vue.prototype.$http = axios
@@ -36,17 +37,14 @@ axios.interceptors.response.use(response => {
   return Promise.reject(error)
 })
 
-// import 'typeface-roboto'
-// import './scrollbar'
-
 /**
  * muse 主题
  */
 theme.add('custom-theme', {
-  primary: '#009688',
-  secondary: colors.pinkA200,
+  primary: '#fb8e00',
+  secondary: '#006dfb',
   background: {
-    default: '#263238'
+    default: '#4A4A4A'
   }
 });
 theme.use('custom-theme');
