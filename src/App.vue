@@ -1,5 +1,6 @@
 <template>
     <div id="app">
+        <iframe height="740" src="https://ac.yunyoujun.cn"></iframe>
         <router-view/>
     </div>
 </template>

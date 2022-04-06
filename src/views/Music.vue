@@ -1605,18 +1605,14 @@ export default {
       }
     },
     sendHandler: function () {
-      // console.log('消息发送处理器');
       let stompClient = this.$store.getters.getStompClient;
       let chatMessage = this.$store.getters.getChatMessage;
-
       let instruction = sendUtils.parseInstruction(chatMessage);
       let content = "";
-
       switch (instruction) {
         case "点歌":
           content = sendUtils.parseContent(instruction, chatMessage);
           if (content === "") {
-            // console.log('请输入音乐关键词', chatMessage)
           } else {
             stompClient.send(
               "/music/pick",
@@ -1937,11 +1933,9 @@ export default {
           }
           break;
       }
-
       this.$store.commit("setChatMessage", "");
     },
     messageHandler: function (source) {
-      // console.log('消息处理器收到消息', source);
       if (messageUtils.isKnowMessageType(source.data)) {
         let messageType = messageUtils.parseMessageType(source.data);
         let messageContent = messageUtils.parseMessageContent(source.data);
@@ -2005,7 +1999,6 @@ export default {
               });
             }
             break;
-
           case messageUtils.messageType.CHAT:
             // parse picture
             let imgList = [];
@@ -2031,7 +2024,6 @@ export default {
             } else {
               this.$store.commit("setSocketGood", false);
             }
-            // this.$forceUpdate();
             break;
           case messageUtils.messageType.PICK:
             if (messageContent.message == "goodlist") {

@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "development") {
 } else if (process.env.NODE_ENV === "test") {
     baseUrl = "http://localhost:3100";
 } else if (process.env.NODE_ENV === "production") {
-    baseUrl = "";
+    baseUrl = "https://music.skyrocketing.ninja/musicroom";
 }
 
 let isProduction = false;
